@@ -1,16 +1,13 @@
-package com.farhad.example.functionsample0;
+package com.farhad.example.functionsample1;
 
-import java.time.Duration;
-import java.util.function.Function;
 import java.util.function.Supplier;
-
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import reactor.core.publisher.Flux;
-
+import org.springframework.cloud.function.context.PollableBean;
 /**
  * Spring Cloud Function has 4 main features:
  * 
@@ -34,7 +31,6 @@ import reactor.core.publisher.Flux;
  *    
  *   - Deploying a JAR file containing such an application context with an isolated classloader, so that you can pack them together 
  *     in a single JVM.
- * 
  *    
  *   - Adapters for AWS Lambda, Azure, Google Cloud Functions, Apache OpenWhisk and possibly other "serverless" service providers.
  * 
@@ -45,24 +41,28 @@ import reactor.core.publisher.Flux;
 public class Application {
 
     @Bean
-	public Function<Flux<String>,Flux<String>> uppercaseFlux() {
-		return flux -> flux.map(value -> value.toUpperCase() ) ;
+	public Supplier<Flux<String>> onceExecutedSupplier() {
+		return () -> {
+			String time1 = String.valueOf(System.nanoTime());
+			String time2 = String.valueOf(System.nanoTime());
+			String time3 = String.valueOf(System.nanoTime());
+			
+			return Flux.just(time1,time2,time3);
+		}; 
 	}
 
 	@Bean
-	public Function<String,String> uppercase() {
-		return value -> value.toUpperCase()  ;
+	@PollableBean(splittable = true)
+	public Supplier<Flux<String>> pollableExecutedSupplier() {
+		return () -> {
+			String time1 = String.valueOf(System.nanoTime());
+			String time2 = String.valueOf(System.nanoTime());
+			String time3 = String.valueOf(System.nanoTime());
+			
+			return Flux.just(time1,time2,time3);
+		}; 
 	}
 
-	@Bean
-	public Supplier<Flux<String>> stringSupplierFlux() {
-		return () -> 
-              Flux
-			  	.interval(Duration.ofSeconds(2))
-				.log()
-				.map(counter -> String.format("Counter-%s", counter) );
-		
-	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
