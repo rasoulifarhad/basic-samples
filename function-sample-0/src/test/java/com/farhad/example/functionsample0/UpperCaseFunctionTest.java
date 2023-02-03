@@ -12,7 +12,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import lombok.extern.slf4j.Slf4j;
 
 // @Slf4j
-public class TestApp {
+public class UpperCaseFunctionTest {
 
 
     @Test 
