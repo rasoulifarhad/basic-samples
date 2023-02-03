@@ -6,6 +6,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import reactor.core.publisher.Flux;
+import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.messaging.Message;
+
 
 @SpringBootApplication
 public class Application {
@@ -31,6 +35,16 @@ public class Application {
 		return (s) -> new StringBuilder(s).reverse().toString();
 	}
 
+
+	@Bean
+	public IntegrationFlow uppercaseFlow() {
+		return IntegrationFlows
+						.from(MessageFunction.class,(gateway) -> gateway.beanName("uppercaseflow"))
+						.<String,String>transform(String::toUpperCase)
+						.logAndReply();
+	}
+
+	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 		// SpringApplication.run(FunctionSampleApplication.class, "--management.endpoints.web.exposure.include=functions");
